@@ -12,5 +12,8 @@ class ProductTest {
         assertEquals(new Money(2500), product.getVatAmount());
     }
 
-    
+    @Test 
+    void tomtNamnGerFel() {
+        assertThrows(IllegalArgumentException.class, () -> new Product("", new Money(1000), new VatRate(25)));
+    }
 }
