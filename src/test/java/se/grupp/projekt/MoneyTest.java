@@ -21,5 +21,10 @@ class MoneyTest {
         Money money2 = new Money(1000);
         assertEquals(money1, money2);
     }
+
+    @Test 
+        void visasSomKr()  {
+            assertEquals("10.00 kr", new Money(1000).toString());
+        }
     
 }
