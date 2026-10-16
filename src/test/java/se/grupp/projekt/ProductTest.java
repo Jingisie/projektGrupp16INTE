@@ -16,4 +16,10 @@ class ProductTest {
     void tomtNamnGerFel() {
         assertThrows(IllegalArgumentException.class, () -> new Product("", new Money(1000), new VatRate(25)));
     }
+
+    @Test 
+    void varaVisasMedNamnOchPris() {
+        Product product = new Product("Testprodukt", new Money(12500), new VatRate(25));
+        assertEquals("Testprodukt: 125, 00 kr", product.toString());
+    }
 }
