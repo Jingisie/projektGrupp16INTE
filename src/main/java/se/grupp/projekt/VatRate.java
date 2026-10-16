@@ -5,6 +5,9 @@ public class VatRate {
     private final int percentage;
     
     public VatRate(int percentage) {
+        if (percentage < 0) {
+            throw new IllegalArgumentException("Momsprocenten kan inte vara negativ");
+        }
         this.percentage = percentage;
     }
 
