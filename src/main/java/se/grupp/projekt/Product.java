@@ -9,7 +9,7 @@ public class Product {
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("Produktnamnet kan inte vara tomt");
         }
-        
+
         this.name = name;
         this.price = price;
         this.vatRate = vatRate;
@@ -17,6 +17,11 @@ public class Product {
 
     public Money getVatAmount() {
         return vatRate.calculateVat(price);
+    }
+
+    @Override 
+    public String toString() {
+        return name + ": " + price;
     }
     
 }
