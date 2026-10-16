@@ -6,6 +6,10 @@ public class Product {
     private final VatRate vatRate;
 
     public Product(String name, Money price, VatRate vatRate) {
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("Produktnamnet kan inte vara tomt");
+        }
+        
         this.name = name;
         this.price = price;
         this.vatRate = vatRate;
