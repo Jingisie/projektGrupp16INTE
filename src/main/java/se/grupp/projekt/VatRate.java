@@ -12,7 +12,7 @@ public class VatRate {
     }
 
     public Money calculateVat(Money money) {
-        long vatAmountInOre = (money.getAmountInOre() * percentage) / (100 + percentage);
+        long vatAmountInOre = money.getAmountInOre() * percentage / (100 + percentage);
         return new Money(vatAmountInOre);
     }
 }
