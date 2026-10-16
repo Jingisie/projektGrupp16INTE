@@ -12,10 +12,7 @@ class MoneyTest {
 
     @Test
     void adderaTvaBelopp() {
-        Money money1 = new Money(1000);
-        Money money2 = new Money(500);
-        Money sum = new Money(money1.getAmountInOre() + money2.getAmountInOre());
-        assertEquals(1500, sum.getAmountInOre());
+        assertEquals(new Money(2500), new Money(1000).add(new Money(1500)));
     }
 
     @Test 
