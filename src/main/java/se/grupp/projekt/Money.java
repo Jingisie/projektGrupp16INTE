@@ -27,5 +27,10 @@ public class Money {
     public int hashCode() {
         return Long.hashCode(amountInOre);
     }
+
+    @Override 
+    public String toString() {
+        return String.format("%d, %02d kr", amountInOre / 100, amountInOre % 100);
+    }
     
 }

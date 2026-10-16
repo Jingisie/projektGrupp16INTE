@@ -24,7 +24,7 @@ class MoneyTest {
 
     @Test 
         void visasSomKr()  {
-            assertEquals("10.00 kr", new Money(1000).toString());
+            assertEquals("10, 00 kr", new Money(1000).toString());
         }
     
 }
