@@ -15,9 +15,9 @@ class PaymentTest {
 
     @Test 
     void approvedPaymentGivesPaidState() {
-        Money amount = new Money (12000);
+        Money amount = new Money(12000);
         when(terminal.charge(amount))
-        .thenReturn(new PaymentResult(PaymentStatus.APPROVED));
+            .thenReturn(new PaymentResult(PaymentStatus.APPROVED));
 
         Payment payment = new Payment(terminal, amount);
         payment.pay();
