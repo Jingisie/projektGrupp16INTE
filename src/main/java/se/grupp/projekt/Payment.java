@@ -12,8 +12,12 @@ public class Payment {
     }
 
     public void pay(){
-        terminal.charge(amount);
-        state = PaymentState.PAID;
+        PaymentResult result = terminal.charge(amount);
+        if (result.status() == PaymentStatus.APPROVED){
+            state = PaymentState.PAID;
+        } else {
+            state = PaymentState.DECLINED;
+        }
     }
 
     public PaymentState getState(){
