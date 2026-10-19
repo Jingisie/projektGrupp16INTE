@@ -24,5 +24,17 @@ class PaymentTest {
 
         assertEquals(PaymentState.PAID, payment.getState());
     }
+
+    @Test 
+    void declinedPaymentGivesDeclinedState(){
+        Money amount = new Money(12000);
+        when(terminal.charge(amount))
+            .thenReturn(new PaymentResult(PaymentStatus.DECLINED));
+
+        Payment payment = new Payment(terminal, amount);
+        payment.pay();
+
+        assertEquals(PaymentState.DECLINED, payment.getState());
+    }
     
 }
