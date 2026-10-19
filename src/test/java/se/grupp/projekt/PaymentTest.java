@@ -1,5 +1,6 @@
 package se.grupp.projekt;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -13,13 +14,20 @@ class PaymentTest {
 
     @Mock PaymentTerminal terminal;
 
+    private Money amount;
+    private Payment payment;
+
+    @BeforeEach 
+    void setUp() {
+        amount = new Money(12000);
+        payment = new Payment(terminal, amount);
+    }
+
     @Test 
     void approvedPaymentGivesPaidState() {
-        Money amount = new Money(12000);
         when(terminal.charge(amount))
             .thenReturn(new PaymentResult(PaymentStatus.APPROVED));
 
-        Payment payment = new Payment(terminal, amount);
         payment.pay();
 
         assertEquals(PaymentState.PAID, payment.getState());
