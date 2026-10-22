@@ -11,6 +11,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.any;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -91,6 +93,22 @@ class PaymentTest {
         //kontrollera att terminalen bara anropas en gång
         verify(terminal, times(1)).charge(amount);
 
+    }
+
+    @Test 
+    void negativeAmountThrowsException() {
+        // Skapa en Payment med ett negativt belopp (K1, testvärde -250 öre)
+        Payment negativePayment = new Payment(terminal, new Money(-250));
+
+        //Utför och kontrollera: pay() ska kasta ett IllegalArgumentException med ett specifikt felmeddelande 
+        //assertThrows returnerar det kastade undantaget, vilket vi kan använda för att kontrollera meddelandet
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, negativePayment::pay);
+
+        //Rätt meddelande är vad som skiljer K1 (negativt) från K2 (0) 
+        assertEquals("Beloppet får ej vara negativt.", exception.getMessage());
+
+        //Mockito: temrinalen får inte anropas oavsett beloppet
+        verify(terminal, never()).charge(any());
     }
     
 }
