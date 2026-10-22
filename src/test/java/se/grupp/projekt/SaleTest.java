@@ -19,3 +19,16 @@ void getTotal_singleProduct_returnsItsPrice() {
 
 }
 
+      @Test
+    void getTotal_allProduct() {
+        Sale sale = new Sale();
+
+        sale.addProduct(new Product("Mjölk", 15.0));
+        sale.addProduct(new Product("Bröd", 25.0));
+        sale.addProduct(new Product("Äpple", 10.0));
+
+        double result = sale.calculateTotal();
+
+        assertEquals(50.0, result, 0.001);
+}
+
