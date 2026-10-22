@@ -15,36 +15,44 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(MockitoExtension.class)
 class PaymentTest {
 
+    //En mockad PaymentTerminal som vi kan använda för att simulera olika scenarion
     @Mock PaymentTerminal terminal;
 
     private Money amount;
     private Payment payment;
 
+    //Körs innan varje testfall för att skapa en ny Payment-instans med en mockad betalning (payment) och ett belopp
     @BeforeEach 
     void setUp() {
         amount = new Money(12000);
         payment = new Payment(terminal, amount);
     }
 
+    //En godkänd betalning ska leda till att betalningen får statusen "PAID"
     @Test 
     void approvedPaymentGivesPaidState() {
+        //terminalen ska returnera en godkänd PaymentResult när charge() anropas med amount
         when(terminal.charge(amount))
             .thenReturn(new PaymentResult(PaymentStatus.APPROVED));
 
+        //genomför betalningen
         payment.pay();
 
+        //kontrollera att betalningens status är "PAID"
         assertEquals(PaymentState.PAID, payment.getState());
     }
 
+    //nekad betalning ska leda till att betalningen får statusen "DECLINED"
     @Test 
     void declinedPaymentGivesDeclinedState(){
-        Money amount = new Money(12000);
+        //arrangera mocken att returnera en declined PaymentResult när charge() anropas med amount
         when(terminal.charge(amount))
             .thenReturn(new PaymentResult(PaymentStatus.DECLINED));
 
-        Payment payment = new Payment(terminal, amount);
+        //försök att genomföra betalningen
         payment.pay();
 
+        //betalningen ska nu vara markerad som "DECLINED"
         assertEquals(PaymentState.DECLINED, payment.getState());
     }
 
