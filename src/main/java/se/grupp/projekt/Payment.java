@@ -18,10 +18,14 @@ public class Payment {
         if(state == PaymentState.PAID) {
             throw new IllegalStateException("Betalningen är redan godkänd och kan inte genomföras igen.");
         }
-        //en betalning med ett negativt belopp är inte tillåten, kasta ett undantag
+        //en betalning med ett negativt belopp är inte tillåten, kasta ett undantag (K1)
         if (amount.getAmountInOre() < 0) {
             throw new IllegalArgumentException("Beloppet får ej vara negativt.");
         }   
+        //en betalning med ett belopp på 0 är inte tillåten, kasta ett undantag (K2)
+        if (amount.getAmountInOre() == 0) {
+            throw new IllegalArgumentException("Beloppet får ej vara 0.");
+        }
         //skicka debiteringsförfrågan till terminalen och uppdatera tillståndet baserat på resultatet
         PaymentResult result = terminal.charge(amount);
         if (result.status() == PaymentStatus.APPROVED) {

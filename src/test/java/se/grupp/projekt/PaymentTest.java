@@ -121,7 +121,7 @@ class PaymentTest {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, zeroPayment::pay);
 
         //Rätt meddelande är vad som skiljer K2 (0) från K1 (negativt)
-        assertEquals("Beloppet får ej vara negativt.", exception.getMessage());
+        assertEquals("Beloppet får ej vara 0.", exception.getMessage());
 
         //Mockito: temrinalen får inte anropas oavsett beloppet
         verify(terminal, never()).charge(any());
