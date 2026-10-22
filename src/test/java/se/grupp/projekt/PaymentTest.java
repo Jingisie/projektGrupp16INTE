@@ -110,5 +110,21 @@ class PaymentTest {
         //Mockito: temrinalen får inte anropas oavsett beloppet
         verify(terminal, never()).charge(any());
     }
+
+    @Test 
+    void zeroAmountIsRejected(){
+
+        // Skapa en Payment med ett belopp på 0 öre (K2, testvärde 0 öre, även ett gränsvärde)
+        Payment zeroPayment = new Payment(terminal, new Money(0));
+
+        //Utför och kontrollera: pay() ska kasta ett IllegalArgumentException med ett specifikt felmeddelande
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, zeroPayment::pay);
+
+        //Rätt meddelande är vad som skiljer K2 (0) från K1 (negativt)
+        assertEquals("Beloppet får ej vara negativt.", exception.getMessage());
+
+        //Mockito: temrinalen får inte anropas oavsett beloppet
+        verify(terminal, never()).charge(any());
+    }
     
 }
