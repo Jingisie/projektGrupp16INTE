@@ -23,5 +23,10 @@ public class Product {
     public String toString() {
         return name + ": " + price;
     }
+
+    public double getPrice() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getPrice'");
+    }
     
 }
