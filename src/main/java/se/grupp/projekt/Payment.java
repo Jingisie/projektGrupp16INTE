@@ -20,11 +20,11 @@ public class Payment {
         }
         //en betalning med ett negativt belopp är inte tillåten, kasta ett undantag (K1)
         if (amount.getAmountInOre() < 0) {
-            throw new IllegalArgumentException("Beloppet får ej vara negativt.");
+            validateAmount(); //validera beloppet, detta kommer att kasta ett IllegalArgumentException med ett specifikt felmeddelande
         }   
         //en betalning med ett belopp på 0 är inte tillåten, kasta ett undantag (K2)
         if (amount.getAmountInOre() == 0) {
-            throw new IllegalArgumentException("Beloppet får ej vara 0.");
+            validateAmount(); //validera beloppet, detta kommer att kasta ett IllegalArgumentException med ett specifikt felmeddelande
         }
         //skicka debiteringsförfrågan till terminalen och uppdatera tillståndet baserat på resultatet
         PaymentResult result = terminal.charge(amount);
@@ -38,4 +38,13 @@ public class Payment {
     public PaymentState getState() {
         return state; 
     }   
+
+    private void validateAmount() {
+        if (amount.getAmountInOre() < 0) {
+            throw new IllegalArgumentException("Beloppet får ej vara negativt.");
+        }
+        if (amount.getAmountInOre() == 0) {
+            throw new IllegalArgumentException("Beloppet får ej vara 0.");
+        }
+    }
 }
