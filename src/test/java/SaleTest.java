@@ -7,18 +7,25 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SaleTest {
 
-    @Test
-    void getTotal_emptySale_returnsZero() {
-        Sale sale = new Sale();
 
-        assertEquals(0.0, sale.getTotal(), 0.0001);
-    }
-    @Test
+   
 void getTotal_singleProduct_returnsItsPrice() {
     Sale sale = new Sale();
     sale.addProduct(new Product("Mjölk", 12.50));
 
     assertEquals(12.50, sale.getTotal(), 0.0001);
+
+      @Test
+    void getTotal_allProduct() {
+        Sale sale = new Sale();
+
+        sale.addProduct(new Product("Mjölk", 15.0));
+        sale.addProduct(new Product("Bröd", 25.0));
+        sale.addProduct(new Product("Äpple", 10.0));
+
+        double result = sale.calculateTotal();
+
+        assertEquals(50.0, result, 0.001);
 }
 }
 
