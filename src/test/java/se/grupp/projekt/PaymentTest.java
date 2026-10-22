@@ -12,8 +12,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+
 @ExtendWith(MockitoExtension.class)
 class PaymentTest {
+
+    //gör om till konstanter för att undvika att skapa nya objekt varje gång
+    private static final PaymentResult APPROVED = new PaymentResult(PaymentStatus.APPROVED);
+    private static final PaymentResult DECLINED = new PaymentResult(PaymentStatus.DECLINED);
 
     //En mockad PaymentTerminal som vi kan använda för att simulera olika scenarion
     @Mock PaymentTerminal terminal;
@@ -33,7 +38,7 @@ class PaymentTest {
     void approvedPaymentGivesPaidState() {
         //terminalen ska returnera en godkänd PaymentResult när charge() anropas med amount
         when(terminal.charge(amount))
-            .thenReturn(new PaymentResult(PaymentStatus.APPROVED));
+            .thenReturn(APPROVED);
 
         //genomför betalningen
         payment.pay();
@@ -47,7 +52,7 @@ class PaymentTest {
     void declinedPaymentGivesDeclinedState(){
         //arrangera mocken att returnera en declined PaymentResult när charge() anropas med amount
         when(terminal.charge(amount))
-            .thenReturn(new PaymentResult(PaymentStatus.DECLINED));
+            .thenReturn(DECLINED);
 
         //försök att genomföra betalningen
         payment.pay();
@@ -61,9 +66,9 @@ class PaymentTest {
         //mocken spelar två olika scenarion, först nekad betalning och sedan godkänd betalning
         when(terminal.charge(amount))
             //nekat
-            .thenReturn(new PaymentResult(PaymentStatus.DECLINED))
+            .thenReturn(DECLINED)
             //godkänt
-            .thenReturn(new PaymentResult(PaymentStatus.APPROVED));
+            .thenReturn(APPROVED);
 
         payment.pay();
         payment.pay();
@@ -77,7 +82,7 @@ class PaymentTest {
     void cantPayAfterApprovedPayment() {
         //mocken returnerar en godkänd betalning
         when(terminal.charge(amount))
-            .thenReturn(new PaymentResult(PaymentStatus.APPROVED));
+            .thenReturn(APPROVED);
         payment.pay();
         
         //andra anropet till pay() ska kasta ett IllegalStateException eftersom betalningen redan är godkänd
