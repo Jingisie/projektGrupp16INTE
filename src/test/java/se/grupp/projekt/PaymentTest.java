@@ -9,6 +9,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 @ExtendWith(MockitoExtension.class)
 class PaymentTest {
 
@@ -43,6 +46,23 @@ class PaymentTest {
         payment.pay();
 
         assertEquals(PaymentState.DECLINED, payment.getState());
+    }
+
+    @Test 
+    void customerMayRetryPaymentAfterDeclinedPayment() {
+        //mocken spelar två olika scenarion, först nekad betalning och sedan godkänd betalning
+        when(terminal.charge(amount))
+            //nekat
+            .thenReturn(new PaymentResult(PaymentStatus.DECLINED))
+            //godkänt
+            .thenReturn(new PaymentResult(PaymentStatus.APPROVED));
+
+        payment.pay();
+        payment.pay();
+
+        assertEquals(PaymentState.PAID, payment.getState());
+        //kolla om terminalen anropas 2 gånger
+        verify(terminal, times(2)).charge(amount);
     }
     
 }
