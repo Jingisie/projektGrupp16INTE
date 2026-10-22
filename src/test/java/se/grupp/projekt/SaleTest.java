@@ -15,7 +15,7 @@ void getTotal_singleProduct_returnsItsPrice() {
     Sale sale = new Sale();
     sale.addProduct(new Product("Mjölk", 12.50));
 
-    assertEquals(12.50, sale.getTotal(), 0.0001);
+    assertEquals(12.50, sale.getTotal());
 
 }
 
@@ -29,6 +29,7 @@ void getTotal_singleProduct_returnsItsPrice() {
 
         double result = sale.calculateTotal();
 
-        assertEquals(50.0, result, 0.001);
+        assertEquals(50.0, result);
+}
 }
 
