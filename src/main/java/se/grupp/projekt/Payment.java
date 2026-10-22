@@ -12,6 +12,9 @@ public class Payment {
     }
 
     public void pay(){
+        if(state == PaymentState.PAID) {
+            throw new IllegalStateException("Betalningen är redan godkänd och kan inte genomföras igen.");
+        }
         PaymentResult result = terminal.charge(amount);
         if (result.status() == PaymentStatus.APPROVED) {
             state = PaymentState.PAID;
