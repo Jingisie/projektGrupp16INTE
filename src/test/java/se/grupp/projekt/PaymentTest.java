@@ -3,12 +3,12 @@ package se.grupp.projekt;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import static org.mockito.Mockito.when;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
-
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -71,6 +71,21 @@ class PaymentTest {
         assertEquals(PaymentState.PAID, payment.getState());
         //kolla om terminalen anropas 2 gånger
         verify(terminal, times(2)).charge(amount);
+    }
+
+    @Test 
+    void cantPayAfterApprovedPayment() {
+        //mocken returnerar en godkänd betalning
+        when(terminal.charge(amount))
+            .thenReturn(new PaymentResult(PaymentStatus.APPROVED));
+        payment.pay();
+        
+        //andra anropet till pay() ska kasta ett IllegalStateException eftersom betalningen redan är godkänd
+        assertThrows(IllegalStateException.class, payment::pay); 
+
+        //kontrollera att terminalen bara anropas en gång
+        verify(terminal, times(1)).charge(amount);
+
     }
     
 }
