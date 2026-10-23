@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Sale {
-    private List<Item> items;
+    private List<Product> items;
 
     public Sale() {
         this.items = new ArrayList<>();
@@ -14,12 +14,10 @@ public class Sale {
     }
     public double getTotal(){
         double total= 0.0;
-    for (Item t : items){
+    for (Product t : items){
         total += t.getPrice();
     }
     return total;
 }
 
 }
-
-

@@ -1,5 +1,6 @@
 package se.grupp.projekt;
 
+
 public class Item {
     private String name ;
     private int  priceInOre;
@@ -11,7 +12,15 @@ public class Item {
             throw new IllegalArgumentException("Priset får inte vara negativt");
         }
         this.name = name;
-        this.priceInOre = priceInOre;
+        this.priceInOre = (int) priceInOre;
+    }
+    
+    public String getName() {
+        return name;
+    }
+ 
+    public int getPriceInOre() {
+        return priceInOre;
     }
 
 

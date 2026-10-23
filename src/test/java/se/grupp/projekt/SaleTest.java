@@ -6,11 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
  
 class SaleTest {
- 
+
     @Test
     void totalenForEnVaraArDessPris() {
         Sale sale = new Sale();
-        sale.addItem(new Item("Mjölk", 1250));
+        sale.addItem(new ItemTest("Mjölk", 1250));
  
         assertEquals(1250, sale.getTotal());
     }
@@ -35,11 +35,11 @@ class SaleTest {
  
     @Test
     void varaUtanNamnGerFel() {
-        assertThrows(IllegalArgumentException.class, () -> new Item(null, 2000));
+        assertThrows(IllegalArgumentException.class, () -> new ItemTest(null, 2000));
     }
  
     @Test
     void varaMedNegativtPrisGerFel() {
-        assertThrows(IllegalArgumentException.class, () -> new Item("Mjölk", -1000));
+        assertThrows(IllegalArgumentException.class, () -> new ItemTest("Mjölk", -1000));
     }
 }
