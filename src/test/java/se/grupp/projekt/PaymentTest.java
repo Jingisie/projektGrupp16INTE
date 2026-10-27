@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.mockito.Mockito.when;
 import org.mockito.Mock;
@@ -96,10 +98,11 @@ class PaymentTest {
 
     }
 
-    @Test 
-    void negativeAmountThrowsException() {
-        // Skapa en Payment med ett negativt belopp (K1, testvärde -250 öre)
-        Payment negativePayment = new Payment(terminal, new Money(-250));
+    @ParameterizedTest
+    @ValueSource(ints = {-250, -1})
+    void negativeAmountThrowsException(long amountInOre) {
+        //Skapa en Payment med ett negativt belopp (K1, testvärde -250 & -1 öre)
+        Payment negativePayment = new Payment(terminal, new Money(amountInOre));
 
         // Utför och kontrollera: pay() ska kasta ett IllegalArgumentException med ett specifikt felmeddelande 
         // assertThrows returnerar det kastade undantaget, vilket vi kan använda för att kontrollera meddelandet
@@ -108,7 +111,7 @@ class PaymentTest {
         // Rätt meddelande är vad som skiljer K1 (negativt) från K2 (0) 
         assertEquals("Beloppet får ej vara negativt.", exception.getMessage());
 
-        // Mockito: temrinalen får inte anropas oavsett beloppet
+        // Mockito: terminalen får inte anropas oavsett beloppet
         verify(terminal, never()).charge(any());
     }
 
