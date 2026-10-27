@@ -4,20 +4,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Sale {
-    private List<Product> items;
+    private final List<Product> products = new ArrayList<>();
 
-    public Sale() {
-        this.items = new ArrayList<>();
+    public void addProduct(Product product) {
+        products.add(product);
     }
-      public void addItem(Product item) {
-          items.add(item);
-    }
-    public double getTotal(){
-        double total= 0.0;
-    for (Product t : items){
-        total += t.getPrice();
-    }
-    return total;
-}
 
+    public List<Product> getProducts() {
+        return products;
+    }
+
+    public Money getTotal() {
+        Money total = new Money(0);
+        for (Product product : products) {
+            total = total.add(product.getPrice());
+        }
+        return total;
+    }
 }
