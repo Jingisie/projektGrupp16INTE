@@ -171,12 +171,29 @@ class PaymentTest {
     void terminalCrashThrowsTerminalUnavailableException() {
         // Mocken simulerar ett kraschat terminal genom att kasta ett RuntimeException när charge() anropas
         when(terminal.charge(amount))
+            //thenThrow istället för thenReturn, låtsas att terminalen kraschar
             .thenThrow(new RuntimeException("Nätverksfel"));
 
         // Kassan ska få vårt eget undantag, inte terminalens egna råa undantag
         assertThrows(TerminalUnavailableException.class, payment::pay);
 
-        // betalningens status ska fortfarande vara "PENDING" eftersom betalningen inte kunde genomföras
+        // Betalningen har inte fastnat och ordern finns kvar i kassan
         assertEquals(PaymentState.OPEN, payment.getState());
+    }
+
+    @Test 
+    void awaitingPaymentWhileTerminalProcesses() {
+        //när terminalen anropas kontrolleras tillståndet när det är mitt i betalningen 
+        //invocation -> {} = lambda som mockito kör när charge anropas        
+        when(terminal.charge(amount)).thenAnswer(invocation -> {
+            //kolla att vi är i AWAITING_PAYMENT
+            assertEquals(PaymentState.AWAITING_PAYMENT, payment.getState());
+            //returnera APPROVED, precis som om vi skulle ha använt thenReturn
+            return APPROVED;
+        });
+        //utför betalningen 
+        payment.pay();
+        //kontrollera att efter godkänt svar ska betalningen vara genomförd
+        assertEquals(PaymentState.PAID, payment.getState());
     }
 }
