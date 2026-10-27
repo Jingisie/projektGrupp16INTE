@@ -8,7 +8,7 @@ class ReceiptTest {
  private Receipt receipt;
     private Sale saleWithTotal(int ore) {
         Sale sale = new Sale();
-        sale.addItem(new Item("Vara", ore));
+        sale.addProduct(new Product("Vara", ore));
         return sale;
     }
 
@@ -24,6 +24,17 @@ class ReceiptTest {
         Receipt receipt = new Receipt(saleWithTotal(1250));
  
         assertTrue(receipt.format().startsWith("Totalt"));
+    }
+       @Test
+    void fleraProdukterSummerasTillTotal() {
+        Sale sale = new Sale();
+        sale.addProduct(new Product("Mjölk", 1500));
+        sale.addProduct(new Product("Bröd", 2500));
+        String text = new Receipt(sale).format();
+
+        assertTrue(text.contains("Mjölk"));
+        assertTrue(text.contains("Bröd"));
+        assertTrue(text.contains("40,00 kr"));
     }
  
 }
