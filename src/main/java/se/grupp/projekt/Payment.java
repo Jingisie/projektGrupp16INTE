@@ -18,6 +18,8 @@ public class Payment {
             if(state == PaymentState.PAID) {
                 throw new IllegalStateException("Betalningen är redan godkänd och kan inte genomföras igen.");
             }
+            // validera beloppet innan betalningen genomförs (K1 eller K2 kastar ett IllegalArgumentException med ett specifikt felmeddelande)
+            validateAmount(); 
             //en betalning med ett negativt belopp är inte tillåten, kasta ett undantag (K1)
             if (amount.getAmountInOre() < 0) {
                 validateAmount(); //validera beloppet, detta kommer att kasta ett IllegalArgumentException med ett specifikt felmeddelande
