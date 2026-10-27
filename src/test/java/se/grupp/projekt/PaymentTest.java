@@ -166,4 +166,17 @@ class PaymentTest {
         // betalningen ska nu vara markerad som "DECLINED"
         assertEquals(PaymentState.DECLINED, payment.getState());
     }
+
+    @Test 
+    void terminalCrashThrowsTerminalUnavailableException() {
+        // Mocken simulerar ett kraschat terminal genom att kasta ett RuntimeException när charge() anropas
+        when(terminal.charge(amount))
+            .thenThrow(new RuntimeException("Nätverksfel"));
+
+        // Kassan ska få vårt eget undantag, inte terminalens egna råa undantag
+        assertThrows(TerminalUnavailableException.class, payment::pay);
+
+        // betalningens status ska fortfarande vara "PENDING" eftersom betalningen inte kunde genomföras
+        assertEquals(PaymentState.OPEN, payment.getState());
+    }
 }
