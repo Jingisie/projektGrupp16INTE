@@ -14,6 +14,9 @@ public class Product {
         this.price = price;
         this.vatRate = vatRate;
     }
+      public String getName() {
+        return name;
+    }
 
     public Money getVatAmount() {
         return vatRate.calculateVat(price);
