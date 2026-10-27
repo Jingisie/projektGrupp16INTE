@@ -16,6 +16,8 @@ public class ScannerTest {
 void barcodeNull() {
     assertThrows(IllegalArgumentException.class, () -> scanner.barcode(null));
 }
+
+
 }
 
 
