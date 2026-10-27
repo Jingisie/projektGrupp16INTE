@@ -28,13 +28,17 @@ class ReceiptTest {
        @Test
     void fleraProdukterSummerasTillTotal() {
         Sale sale = new Sale();
-        sale.addProduct(new Product("Mjölk", 1500));
-        sale.addProduct(new Product("Bröd", 2500));
+   sale.addProduct(new Product("Vara", new Money(ore), new VatRate(25)));
+   sale.addProduct(new Product("Mjölk", new Money(1500), new VatRate(25)));
         String text = new Receipt(sale).format();
 
         assertTrue(text.contains("Mjölk"));
         assertTrue(text.contains("Bröd"));
         assertTrue(text.contains("40,00 kr"));
+    }
+     @Test
+    void nullForsaljningKastarException() {
+        assertThrows(IllegalArgumentException.class, () -> new Receipt(null));
     }
  
 }
