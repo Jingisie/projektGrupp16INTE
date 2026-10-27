@@ -24,6 +24,7 @@ class PaymentTest {
     // gör om till konstanter för att undvika att skapa nya objekt varje gång
     private static final PaymentResult APPROVED = new PaymentResult(PaymentStatus.APPROVED);
     private static final PaymentResult DECLINED = new PaymentResult(PaymentStatus.DECLINED);
+    private static final PaymentResult ERROR = new PaymentResult(PaymentStatus.ERROR);
 
     // En mockad PaymentTerminal som vi kan använda för att simulera olika scenarion
     @Mock PaymentTerminal terminal;
@@ -152,7 +153,7 @@ class PaymentTest {
     void terminalErrorGivesStateDeclined() {
         // terminalen returnerar ett fel (ERROR) när charge() anropas med amount (t ex nätverksfel eller liknande   )
         when(terminal.charge(amount))
-            .thenReturn(new PaymentResult(PaymentStatus.ERROR));
+            .thenReturn(ERROR);
 
         // försök att genomföra betalningen
         payment.pay();
