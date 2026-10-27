@@ -43,3 +43,13 @@ Noll och negativt är två olika klasser trots att de ger väldigt likande fel, 
 Eftersom vi har två ogiltiga klasser behöver dessa testas en i taget. Detta beror på att ett fel kan dölja ett annat och har vi bara en ogiltig klass per testfall så vet vi genast vad som orsakade felet. En indata --> varje ogiltig klass behöver sitt eget test.
 
 Avsaknaden av ett övre tak för stora belopp (alltså en gräns) beror på att vi ser detta som bankens, eller terminalens, ansvar. Kassan kommer endast att validera att beloppet är positivt, inte HUR positivt det är. Alltså hanteras redan alldeles för stora belopp av terminalen, som svarar DECLINED. 
+
+## Verifiering av gränsvärdestesterna
+
+Gränsvärdestesterna -1 och 1 blev gröna direkt när de kördes, så hur vet vi att de fångar de fel de ska? För att validera att de funkar som de ska gjordes några tillfälliga ändringar i koden: för 1 så ändrades `== 0` till `<`= 1 och för -1 så ändrades `< 0` till `< -1`. 
+
+Efter ändringen för 1 så behandlades även 1 öre (som egentligen ska vara giltigt) som ogiltigt. Metoden `pay()` kastade ett `IllegalArgumentException` för ett giltigt belopp med andra ord. Testet `smallestValidAmountIsCharged` blev rött eftersom betalningen aldrig gick igenom och tillståndet blev aldrig `PAID`. Alltså skulle en kund som vill köpa något för 1 öre bli nekad köpet felaktigt.
+
+Efter ändringen för -1 släppte valideringen igenom -1 som om det vore ett giltigt värde. -1 skickades felaktigt till terminalen och mocken hade inget inställt svar som skulle skicka tillbaka null och därmed kraschade koden med ett `NullPointerException`. Testet `negativeAmountThrowsException` blev rött för körningen med -1 men inte för körningen med -250. Felet i verkligheten blir då att ett negativt belopp skulle skickas till kundens kort. 
+
+Båda testerna för gränsvärdena fångar fel som ligger precis på "kanten", så att säga, vilket är precis den typen av fel gränsvärden används för att hitta. -250 skulle inte ha hittat ett sådant fel och det är just därför gränsvärden behövs och är användbara (notera här skillnaden mellan ekvivalensklassuppdelningen och gränsvärdena). Testerna som var gröna från början visade även att de kunde bli röda, vilket är också meningsfullt.
