@@ -44,10 +44,9 @@ public class WeightPricedItemTest {
 		});
 	}
 	
-	
 	@Test
 	void negativeMoneythrowsIllegalArgument() {
-		assertThrows(IllegalArgumentException.class, ()-> {
+		assertThrows(IllegalArgumentException.class, () -> {
 			WeightPricedItem item = new WeightPricedItem("Bananer", new Money(-2000), Unit.KILO );
 		});
 		
@@ -67,8 +66,6 @@ public class WeightPricedItemTest {
 		});
 	}
 	
-	
-	
 	@Test
 	void nullWeightInGetPriceForThrowsIllegalArgumentException() {
 		WeightPricedItem item = new WeightPricedItem("Bananer", new Money(2000), Unit.KILO);
@@ -85,10 +82,4 @@ public class WeightPricedItemTest {
 		});
 		
 	}
-	
-	
-	
-	
-	
-	
 }

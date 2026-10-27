@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import static org.mockito.Mockito.when;
 import org.mockito.Mock;
@@ -67,12 +68,16 @@ class PaymentTest {
         assertEquals(PaymentState.DECLINED, payment.getState());
     }
 
-    @Test 
-    void customerMayRetryPaymentAfterDeclinedPayment() {
+    // Ersätter @Test med @ParameterizedTest och @EnumSource för att testa flera scenarion med olika PaymentStatus
+    // Alltså försök igen efter DECLINED , försök igen efter ERROR
+    @ParameterizedTest(name = "försök igen efter {0}")
+    // Var värdena kommer ifrån
+    @EnumSource(value = PaymentStatus.class, names = {"DECLINED", "ERROR"})
+    void customerMayRetryPaymentAfterDeclinedPayment(PaymentStatus failedStatus) {
         // mocken spelar två olika scenarion, först nekad betalning och sedan godkänd betalning
         when(terminal.charge(amount))
-            // nekat
-            .thenReturn(DECLINED)
+            // misslyckad betalning (DECLINED eller ERROR)
+            .thenReturn(new PaymentResult(failedStatus))
             // godkänt
             .thenReturn(APPROVED);
 
