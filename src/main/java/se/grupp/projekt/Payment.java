@@ -18,30 +18,15 @@ public class Payment {
             if(state == PaymentState.PAID) {
                 throw new IllegalStateException("Betalningen är redan godkänd och kan inte genomföras igen.");
             }
+            
             // validera beloppet innan betalningen genomförs (K1 eller K2 kastar ett IllegalArgumentException med ett specifikt felmeddelande)
             validateAmount(); 
-            // en betalning med ett negativt belopp är inte tillåten, kasta ett undantag (K1)
-            if (amount.getAmountInOre() < 0) {
-                validateAmount(); //validera beloppet, detta kommer att kasta ett IllegalArgumentException med ett specifikt felmeddelande
-            }   
-            // en betalning med ett belopp på 0 är inte tillåten, kasta ett undantag (K2)
-            if (amount.getAmountInOre() == 0) {
-                validateAmount(); //validera beloppet, detta kommer att kasta ett IllegalArgumentException med ett specifikt felmeddelande
-            }
-
+            
             // betalningen väntar svar från terminalen
             state = PaymentState.AWAITING_PAYMENT;
             
             // skicka debiteringsförfrågan till terminalen och uppdatera tillståndet baserat på resultatet
-            PaymentResult result;
-            try{
-                result = terminal.charge(amount);
-            } catch (RuntimeException e) {
-                // terminalen har kraschat, återställ så att kassören kan starta om betalningen
-                state = PaymentState.OPEN;
-                // terminalen är inte tillgänglig, kastar ett eget undantag som inte behöver deklareras med throws
-                throw new TerminalUnavailableException("Terminalen svarar inte", e);
-            }
+            PaymentResult result = chargeTerminal();
             if (result.status() == PaymentStatus.APPROVED) {
                 state = PaymentState.PAID;
             } else {
@@ -59,6 +44,17 @@ public class Payment {
         }
         if (amount.getAmountInOre() == 0) {
             throw new IllegalArgumentException("Beloppet får ej vara 0.");
+        }
+    }
+
+    private PaymentResult chargeTerminal() {
+        try {
+            return terminal.charge(amount);
+        }
+        catch(RuntimeException e) {
+            //terminalen har kraschat, återställ så att kassören kan starta om betalningen 
+            state = PaymentState.OPEN; 
+            throw new TerminalUnavailableException("Terminalen svarar inte", e);
         }
     }
 }
