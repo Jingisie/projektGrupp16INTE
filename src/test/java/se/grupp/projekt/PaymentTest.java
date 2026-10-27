@@ -147,5 +147,17 @@ class PaymentTest {
         assertEquals(PaymentState.PAID, smallestPayment.getState());
         verify(terminal).charge(oneOre);
     }
-    
+
+    @Test
+    void terminalErrorGivesStateDeclined() {
+        // terminalen returnerar ett fel (ERROR) när charge() anropas med amount (t ex nätverksfel eller liknande   )
+        when(terminal.charge(amount))
+            .thenReturn(new PaymentResult(PaymentStatus.ERROR));
+
+        // försök att genomföra betalningen
+        payment.pay();
+
+        // betalningen ska nu vara markerad som "DECLINED"
+        assertEquals(PaymentState.DECLINED, payment.getState());
+    }
 }
