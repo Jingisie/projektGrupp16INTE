@@ -15,10 +15,10 @@ public class Receipt {
         StringBuilder rows = new StringBuilder();
 
         for (Product product : sale.getProducts()) {
-            rows.append(product.getName())
-                .append("  ")
-                .append(product.getPrice())   
-                .append("\n");
+            rows.append(product.getName());
+              rows.append("  ");
+                rows.append(product.getPrice());   
+                rows.append("\n");
         }
 
         return "Totalt: " + sale.getTotal() + "\n" + rows;
