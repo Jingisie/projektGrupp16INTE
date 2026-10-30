@@ -21,4 +21,6 @@ public class Sale {
         }
         return total;
     }
+     public static void main(String[] args) {
+ }
 }

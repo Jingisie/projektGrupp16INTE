@@ -9,6 +9,7 @@ class ReceiptTest {
     private Sale saleWithTotal(int ore) {
         Sale sale = new Sale();
         sale.addProduct(new Product("Vara", ore));
+        
         return sale;
     }
 

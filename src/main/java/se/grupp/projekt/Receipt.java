@@ -23,4 +23,6 @@ public class Receipt {
 
         return "Totalt: " + sale.getTotal() + "\n" + rows;
     }
+     public static void main(String[] args) {
+ }
 }
