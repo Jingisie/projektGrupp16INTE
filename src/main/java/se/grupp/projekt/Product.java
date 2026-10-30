@@ -15,10 +15,16 @@ public class Product {
         this.price = price;
         this.vatRate = vatRate;
     }
+        public String getName() {
+        return name;
+        }
 
     // Räknar ut varans moms.
     public Money getVatAmount() {
         return vatRate.calculateVat(price);
+    }
+       public Money getPrice(){
+        return price;
     }
 
     // Räknar ut varans moms efter rabatt.
