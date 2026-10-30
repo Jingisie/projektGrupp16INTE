@@ -5,6 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import static org.mockito.Mockito.when;
 import org.mockito.Mock;
@@ -22,6 +25,7 @@ class PaymentTest {
     // gör om till konstanter för att undvika att skapa nya objekt varje gång
     private static final PaymentResult APPROVED = new PaymentResult(PaymentStatus.APPROVED);
     private static final PaymentResult DECLINED = new PaymentResult(PaymentStatus.DECLINED);
+    private static final PaymentResult ERROR = new PaymentResult(PaymentStatus.ERROR);
 
     // En mockad PaymentTerminal som vi kan använda för att simulera olika scenarion
     @Mock PaymentTerminal terminal;
@@ -64,12 +68,16 @@ class PaymentTest {
         assertEquals(PaymentState.DECLINED, payment.getState());
     }
 
-    @Test 
-    void customerMayRetryPaymentAfterDeclinedPayment() {
+    // Ersätter @Test med @ParameterizedTest och @EnumSource för att testa flera scenarion med olika PaymentStatus
+    // Alltså försök igen efter DECLINED , försök igen efter ERROR
+    @ParameterizedTest(name = "försök igen efter {0}")
+    // Var värdena kommer ifrån
+    @EnumSource(value = PaymentStatus.class, names = {"DECLINED", "ERROR"})
+    void customerMayRetryPaymentAfterDeclinedPayment(PaymentStatus failedStatus) {
         // mocken spelar två olika scenarion, först nekad betalning och sedan godkänd betalning
         when(terminal.charge(amount))
-            // nekat
-            .thenReturn(DECLINED)
+            // misslyckad betalning (DECLINED eller ERROR)
+            .thenReturn(new PaymentResult(failedStatus))
             // godkänt
             .thenReturn(APPROVED);
 
@@ -96,10 +104,11 @@ class PaymentTest {
 
     }
 
-    @Test 
-    void negativeAmountThrowsException() {
-        // Skapa en Payment med ett negativt belopp (K1, testvärde -250 öre)
-        Payment negativePayment = new Payment(terminal, new Money(-250));
+    @ParameterizedTest
+    @ValueSource(ints = {-250, -1})
+    void negativeAmountThrowsException(long amountInOre) {
+        //Skapa en Payment med ett negativt belopp (K1, testvärde -250 & -1 öre)
+        Payment negativePayment = new Payment(terminal, new Money(amountInOre));
 
         // Utför och kontrollera: pay() ska kasta ett IllegalArgumentException med ett specifikt felmeddelande 
         // assertThrows returnerar det kastade undantaget, vilket vi kan använda för att kontrollera meddelandet
@@ -108,7 +117,7 @@ class PaymentTest {
         // Rätt meddelande är vad som skiljer K1 (negativt) från K2 (0) 
         assertEquals("Beloppet får ej vara negativt.", exception.getMessage());
 
-        // Mockito: temrinalen får inte anropas oavsett beloppet
+        // Mockito: terminalen får inte anropas oavsett beloppet
         verify(terminal, never()).charge(any());
     }
 
@@ -144,5 +153,30 @@ class PaymentTest {
         assertEquals(PaymentState.PAID, smallestPayment.getState());
         verify(terminal).charge(oneOre);
     }
-    
+
+    @Test
+    void terminalErrorGivesStateDeclined() {
+        // terminalen returnerar ett fel (ERROR) när charge() anropas med amount (t ex nätverksfel eller liknande   )
+        when(terminal.charge(amount))
+            .thenReturn(ERROR);
+
+        // försök att genomföra betalningen
+        payment.pay();
+
+        // betalningen ska nu vara markerad som "DECLINED"
+        assertEquals(PaymentState.DECLINED, payment.getState());
+    }
+
+    @Test 
+    void terminalCrashThrowsTerminalUnavailableException() {
+        // Mocken simulerar ett kraschat terminal genom att kasta ett RuntimeException när charge() anropas
+        when(terminal.charge(amount))
+            .thenThrow(new RuntimeException("Nätverksfel"));
+
+        // Kassan ska få vårt eget undantag, inte terminalens egna råa undantag
+        assertThrows(TerminalUnavailableException.class, payment::pay);
+
+        // betalningens status ska fortfarande vara "PENDING" eftersom betalningen inte kunde genomföras
+        assertEquals(PaymentState.OPEN, payment.getState());
+    }
 }
