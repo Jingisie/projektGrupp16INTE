@@ -31,7 +31,7 @@ public class Weight implements Comparable<Weight> {
     
     public static Weight add(Weight w1, Weight w2) {
         double totalGrams = w1.in(Unit.GRAM) + w2.in(Unit.GRAM);
-        return Weight.of(totalGrams, Unit.GRAM);
+        return of(totalGrams, Unit.GRAM);
     }
     
     @Override
