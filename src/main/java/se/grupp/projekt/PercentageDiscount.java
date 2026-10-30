@@ -1,11 +1,11 @@
 package se.grupp.projekt;
 
-// Omsluter ett pris och drar av en procentuell rabatt.
+// Tar ett pris och drar av en procentuell rabatt.
 public class PercentageDiscount implements Price {
     private final Price originalPrice;
     private final int percentage;
 
-    // Skapar en rabatt som omsluter ett pris.
+    // Skapar en rabatt som tillämpas på ett pris.
     public PercentageDiscount(Price originalPrice, int percentage) {
         if (percentage < 0 || percentage > 100) {
             throw new IllegalArgumentException(
