@@ -15,8 +15,8 @@ class SaleTest {
     @BeforeEach
     void setUp() {
         sale = new Sale();
-        milk = new Product("Mjölk", new Money(1250), new VatRate(12));   // 12,50 kr
-        bread = new Product("Bröd", new Money(3000), new VatRate(12));   // 30,00 kr
+        milk = new Product("Mjölk", new Money(1250), new VatRate(12), "7312345678901");   // 12,50 kr
+        bread = new Product("Bröd", new Money(3000), new VatRate(12), "7312345678902");   // 30,00 kr
     }
       // Ny sale är tom
     @Test

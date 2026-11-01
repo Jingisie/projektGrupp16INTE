@@ -19,8 +19,8 @@ public class ScannerTest {
     @BeforeEach
     void setUp() {
         sale = new Sale();
-        milk = new Product("Mjölk", new Money(1250), new VatRate(12));
-        bread = new Product("Bröd", new Money(3000), new VatRate(12));
+        milk = new Product("Mjölk", new Money(1250), new VatRate(12), MILK_EAN);
+        bread = new Product("Bröd", new Money(3000), new VatRate(12), BREAD_EAN);
 
         Map<String, Product> register = Map.of(
             MILK_EAN, milk,
