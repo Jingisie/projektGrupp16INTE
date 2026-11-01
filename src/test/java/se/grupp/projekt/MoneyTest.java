@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MoneyTest {
+    
+    
     @Test 
     void sparasBeloppetIOre() {
         Money money = new Money(1250);
