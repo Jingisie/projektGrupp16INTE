@@ -2,20 +2,19 @@
 package se.grupp.projekt;
 
 import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.Random;
+class AIBugHunterTest {
 
-public class AIBugHunterTest {
+    private final Random random = new Random();
 
     @Test
-    void testInvalidWeights() {
-
-        System.out.println("Testing invalid weights...");
-
-        assertThrows(IllegalArgumentException.class,
-                () -> Weight.of(-10, Unit.GRAM));
-
+    void testExtremeWeights() {
         assertThrows(IllegalArgumentException.class,
                 () -> Weight.of(Double.NaN, Unit.GRAM));
 
@@ -24,40 +23,53 @@ public class AIBugHunterTest {
 
         assertThrows(IllegalArgumentException.class,
                 () -> Weight.of(Double.NEGATIVE_INFINITY, Unit.GRAM));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> Weight.of(-1, Unit.GRAM));
     }
 
     @Test
-    void testUnitConversions() {
+    void testAdditionOverflow() {
+        Weight a = Weight.of(Double.MAX_VALUE, Unit.GRAM);
+        Weight b = Weight.of(Double.MAX_VALUE, Unit.GRAM);
 
-        System.out.println("Testing unit conversions...");
+        assertThrows(IllegalArgumentException.class,
+                () -> Weight.add(a, b));
+    }
 
-        Random random = new Random(42);
+    @Test
+    void testVerySmallWeights() {
+        Weight a = Weight.of(0.000001, Unit.GRAM);
+        Weight b = Weight.of(0.000002, Unit.GRAM);
 
-        for (int i = 0; i < 1000; i++) {
+        Weight result = Weight.add(a, b);
 
-            double value = random.nextDouble() * 10000;
+        assertEquals(0.000003, result.in(Unit.GRAM), 1e-12);
+    }
 
-            Weight weight = Weight.of(value, Unit.GRAM);
+    @Test
+    void testAllUnitConversions() {
+        for (Unit from : Unit.values()) {
+            for (Unit to : Unit.values()) {
+                double value = 123.456;
 
-            double converted = weight.in(Unit.KILO);
+                Weight original = Weight.of(value, from);
+                double converted = original.in(to);
 
-            double convertedBack =
-                    Weight.of(converted, Unit.KILO)
-                            .in(Unit.GRAM);
+                Weight convertedBack = Weight.of(converted, to);
 
-            assertEquals(value, convertedBack, 0.000001);
+                assertEquals(
+                        original.in(Unit.GRAM),
+                        convertedBack.in(Unit.GRAM),
+                        1e-8
+                );
+            }
         }
     }
 
     @Test
-    void testWeightAddition() {
-
-        System.out.println("Testing weight addition...");
-
-        Random random = new Random(42);
-
+    void testRandomAddition() {
         for (int i = 0; i < 1000; i++) {
-
             double a = random.nextDouble() * 10000;
             double b = random.nextDouble() * 10000;
 
@@ -66,34 +78,24 @@ public class AIBugHunterTest {
 
             Weight result = Weight.add(w1, w2);
 
-            assertEquals(a + b, result.in(Unit.GRAM), 0.000001);
+            assertEquals(a + b, result.in(Unit.GRAM), 1e-8);
         }
     }
 
     @Test
-    void testWeightComparison() {
+    void testComparisonConsistency() {
+        Weight a = Weight.of(1, Unit.KILO);
+        Weight b = Weight.of(1000, Unit.GRAM);
 
-        System.out.println("Testing weight comparison...");
-
-        Weight kilo = Weight.of(1, Unit.KILO);
-        Weight grams = Weight.of(1000, Unit.GRAM);
-
-        assertEquals(kilo, grams);
-        assertEquals(0, kilo.compareTo(grams));
-
-        assertTrue(
-                Weight.of(2, Unit.KILO)
-                        .compareTo(Weight.of(1, Unit.KILO)) > 0
-        );
+        assertEquals(0, a.compareTo(b));
+        assertEquals(a, b);
+        assertEquals(a.hashCode(), b.hashCode());
     }
 
     @Test
-    void testWeightPricedItem() {
-
-        System.out.println("Testing WeightPricedItem...");
-
+    void testPriceRounding() {
         WeightPricedItem item = new WeightPricedItem(
-                "Apple",
+                "Test",
                 new Money(1000),
                 Unit.KILO
         );
@@ -103,37 +105,52 @@ public class AIBugHunterTest {
         );
 
         assertEquals(500, result.getAmountInOre());
-
-        assertThrows(IllegalArgumentException.class,
-                () -> Weight.of(-1, Unit.GRAM));
     }
 
     @Test
-    void testWeighingService() throws ScaleException {
+    void testScaleFailsTwiceThenSucceeds() throws Exception {
+        AtomicInteger attempts = new AtomicInteger();
 
-        System.out.println("Testing WeighingService...");
+        Scale scale = () -> {
+            if (attempts.incrementAndGet() <= 2) {
+                throw new ScaleException("Temporary failure");
+            }
 
-        final int[] attempts = {0};
-
-        Scale failingScale = () -> {
-            attempts[0]++;
-            throw new ScaleException("Sensor failure");
+            return Weight.of(100, Unit.GRAM);
         };
 
-        WeighingService service =
-                new WeighingService(failingScale);
+        WeighingService service = new WeighingService(scale);
 
         WeightPricedItem item = new WeightPricedItem(
-                "Apple",
+                "Test",
                 new Money(1000),
                 Unit.KILO
         );
 
-        assertThrows(
-                ScaleException.class,
-                () -> service.priceOf(item)
+        assertDoesNotThrow(() -> service.priceOf(item));
+        assertEquals(3, attempts.get());
+    }
+
+    @Test
+    void testScaleAlwaysFails() {
+        AtomicInteger attempts = new AtomicInteger();
+
+        Scale scale = () -> {
+            attempts.incrementAndGet();
+            throw new ScaleException("Failure");
+        };
+
+        WeighingService service = new WeighingService(scale);
+
+        WeightPricedItem item = new WeightPricedItem(
+                "Test",
+                new Money(1000),
+                Unit.KILO
         );
 
-        assertEquals(3, attempts[0]);
+        assertThrows(ScaleException.class,
+                () -> service.priceOf(item));
+
+        assertEquals(3, attempts.get());
     }
 }
