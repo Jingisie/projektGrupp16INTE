@@ -7,7 +7,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-
+import org.mockito.InOrder;
+import static org.mockito.Mockito.*;
 
 
 public class WeighingServiceTest {
@@ -99,6 +100,28 @@ public class WeighingServiceTest {
 			service.priceOf(null);
 		});
 	}
+	
+	
+	@Test
+	void priceIsCalculatedOnceWithTheStableWeight() throws Exception {
+	    Scale scale = mock(Scale.class);
+	    Weight stable = Weight.of(500, Unit.GRAM);
+	    when(scale.weigh())
+	        .thenThrow(new ScaleException("Instabil vikt"))
+	        .thenReturn(stable);
+
+	    WeightPricedItem item = spy(new WeightPricedItem("Bananer", new Money(2000), Unit.KILO));
+	    WeighingService service = new WeighingService(scale);
+
+	    service.priceOf(item);
+
+	    InOrder order = inOrder(scale, item);
+	    order.verify(scale, times(2)).weigh();      
+	    order.verify(item).getPriceFor(stable);      
+	    verifyNoMoreInteractions(scale);           
+
+	}
+
 	
 	
 	
