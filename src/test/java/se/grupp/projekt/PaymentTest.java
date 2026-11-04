@@ -10,13 +10,19 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.jupiter.params.provider.EnumSource;
 
 import static org.mockito.Mockito.when;
+
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.never;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.doThrow;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -134,7 +140,7 @@ class PaymentTest {
         assertEquals("Beloppet får ej vara 0.", exception.getMessage());
 
         // Mockito: temrinalen får inte anropas oavsett beloppet
-        verify(terminal, never()).charge(any());
+        verifyNoInteractions(terminal);
     }
 
     @Test 
@@ -179,4 +185,47 @@ class PaymentTest {
         // betalningens status ska fortfarande vara "PENDING" eftersom betalningen inte kunde genomföras
         assertEquals(PaymentState.OPEN, payment.getState());
     }
+
+    @Captor ArgumentCaptor<Money> amountCaptor;
+
+@Test
+    void terminalChargesExactAmount() {
+        when(terminal.charge(any())).thenReturn(APPROVED);
+
+        payment.pay();
+
+        verify(terminal).charge(amountCaptor.capture());
+        assertEquals(new Money(12000), amountCaptor.getValue());
+    }
+
+    @Test
+    void awaitingPaymentWhileTerminalProcesses() {
+        // när terminalen anropas kontrolleras tillståndet mitt i betalningen
+        // invocation -> {} = lambda som Mockito kör när charge anropas
+        when(terminal.charge(amount)).thenAnswer(invocation -> {
+            // kolla att vi är i AWAITING_PAYMENT
+            assertEquals(PaymentState.AWAITING_PAYMENT, payment.getState());
+            // returnera APPROVED, precis som om vi hade använt thenReturn
+            return APPROVED;
+        });
+        // utför betalningen
+        payment.pay();
+        // efter godkänt svar ska betalningen vara genomförd
+        assertEquals(PaymentState.PAID, payment.getState());
+    }
+
+    @Test
+void spyRunsRealTerminalAndRecordsCalls() {
+    FakeCardTerminal card = spy(new FakeCardTerminal(10_000)); // 100 kr på kortet
+    Payment first = new Payment(card, new Money(6_000));        // 60 kr
+    Payment second = new Payment(card, new Money(6_000));       // 60 kr till
+
+    first.pay();
+    second.pay();
+
+    assertEquals(PaymentState.PAID, first.getState());
+    assertEquals(PaymentState.DECLINED, second.getState());   // bara 40 kr kvar
+    assertEquals(4_000, card.getBalanceInOre());              // riktig kod kördes
+    verify(card, times(2)).charge(new Money(6_000));          // anropen spelades in
+}
 }
