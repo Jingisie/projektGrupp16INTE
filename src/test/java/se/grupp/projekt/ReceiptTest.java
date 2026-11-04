@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.spy;
 
 class ReceiptTest {
 
@@ -75,17 +76,19 @@ class ReceiptTest {
         assertEquals(new Money(1_550), receipt.getDiscountAmount(10));
     }
 
-    // Testar momsbeloppet när kvittot har rabatt.
+    // Kollar att kvittot skickar rabatten vidare till varorna.
     @Test
-    void vatTotalAfterTenPercentDiscountIsCorrect() {
-        List<Product> products = List.of(
-                new Product("Coffee", new Money(12_500), new VatRate(25), "7312340000002"),
-                new Product("Bread", new Money(3_000), new VatRate(12), "7312340000002")
-        );
+    void vatTotalAfterTenPercentDiscountUsesDiscountForEachProduct() {
+        Product coffee = spy(new Product(
+                "Coffee", new Money(12_500), new VatRate(25), "7312340000002"));
+        Product bread = spy(new Product(
+                "Bread", new Money(3_000), new VatRate(12), "7312340000019"));
 
-        Receipt receipt = new Receipt(products);
+        Receipt receipt = new Receipt(List.of(coffee, bread));
 
         assertEquals(new Money(2_539), receipt.getVatTotal(10));
+        verify(coffee).getVatAmount(10);
+        verify(bread).getVatAmount(10);
     }
 
     // Testar att kvittot lämnar varorna för utskrift.
