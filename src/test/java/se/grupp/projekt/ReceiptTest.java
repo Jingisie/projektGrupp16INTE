@@ -1,8 +1,13 @@
 package se.grupp.projekt;
 
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class ReceiptTest {
 
@@ -94,5 +99,23 @@ class ReceiptTest {
         Receipt receipt = new Receipt(products);
 
         assertEquals(products, receipt.getProducts());
+    }
+
+    // Kollar att kvittot använder den inskickade rabattberäknaren.
+    @Test
+    void totalUsesInjectedDiscountCalculator() {
+        List<Product> products = List.of(
+                new Product("Coffee", new Money(12_500), new VatRate(25)),
+                new Product("Bread", new Money(3_000), new VatRate(12))
+        );
+
+        DiscountCalculator calculator = mock(DiscountCalculator.class);
+        when(calculator.calculate(new Money(15_500), 10))
+                .thenReturn(new Money(12_345));
+
+        Receipt receipt = new Receipt(products, calculator);
+
+        assertEquals(new Money(12_345), receipt.getTotal(10));
+        verify(calculator).calculate(new Money(15_500), 10);
     }
 }

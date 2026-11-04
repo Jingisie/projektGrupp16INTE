@@ -4,10 +4,16 @@ import java.util.List;
 
 public class Receipt {
     private final List<Product> products;
+    private final DiscountCalculator discountCalculator;
 
     // Skapar ett kvitto med varorna i köpet.
     public Receipt(List<Product> products) {
+        this(products, PercentageDiscount::apply);
+    }
+
+    public Receipt(List<Product> products, DiscountCalculator discountCalculator) {
         this.products = List.copyOf(products);
+        this.discountCalculator = discountCalculator;
     }
 
     // Räknar ihop priserna för kvittots varor.
@@ -50,8 +56,7 @@ public class Receipt {
 
     // Returnerar kvittots total efter rabatt.
     public Money getTotal(int discountPercentage) {
-        Price originalPrice = this::getSubtotal;
-        return new PercentageDiscount(originalPrice, discountPercentage).amount();
+        return discountCalculator.calculate(getSubtotal(), discountPercentage);
     }
 
     // Räknar ut rabattbeloppet på kvittot.
