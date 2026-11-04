@@ -16,7 +16,7 @@ this.sale = sale;
 this.register = register;
 }
 public void scan(String ean) {
-EAN.validera(ean);
+    EAN.validera(ean);
 Product product = register.get(ean);
 if (product == null) {
 throw new IllegalArgumentException("Produkten hittades inte");

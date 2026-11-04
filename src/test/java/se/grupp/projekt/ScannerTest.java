@@ -3,10 +3,17 @@ package se.grupp.projekt;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
 import java.util.Map;
 
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 public class ScannerTest {
     private static final String MILK_EAN = "7312340000002";
     private static final String BREAD_EAN = "7312340000019";
@@ -128,6 +135,18 @@ void tomStrang() {
         () -> assertEquals("EAN får inte vara null eller tom", e.getMessage()),
         () -> assertEquals(0, sale.getProductCount())
     );
+}
+
+@Test
+void ogiltigEanSlasAldrigUppIRegistret() {
+    Map<String, Product> register = spy(new HashMap<>(Map.of(MILK_EAN, milk)));
+    Sale sale = mock(Sale.class);
+    Scanner scanner = new Scanner(sale, register);
+
+    assertThrows(IllegalArgumentException.class, () -> scanner.scan("7312340000001"));
+
+    verify(register, never()).get(any());
+    verifyNoInteractions(sale);
 }
 
 }

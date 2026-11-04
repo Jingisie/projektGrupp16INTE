@@ -9,8 +9,8 @@ class ReceiptTest {
     @Test
     void subtotalIsTheSumOfProductPrices() {
         List<Product> products = List.of(
-                new Product("Coffee", new Money(12_500), new VatRate(25), "7312345678901"),
-                new Product("Bread", new Money(3_000), new VatRate(12), "7312345678902")
+                new Product("Coffee", new Money(12_500), new VatRate(25), "7312340000002"),
+                new Product("Bread", new Money(3_000), new VatRate(12), "7312340000002")
         );
 
         Receipt receipt = new Receipt(products);
@@ -22,8 +22,8 @@ class ReceiptTest {
     @Test
     void vatTotalIsTheSumOfProductVatAmounts() {
         List<Product> products = List.of(
-                new Product("Coffee", new Money(12_500), new VatRate(25), "7312345678901"),
-                new Product("Bread", new Money(3_000), new VatRate(12), "7312345678902")
+                new Product("Coffee", new Money(12_500), new VatRate(25), "7312340000002"),
+                new Product("Bread", new Money(3_000), new VatRate(12), "7312340000002")
         );
 
         Receipt receipt = new Receipt(products);
@@ -35,8 +35,8 @@ class ReceiptTest {
     @Test
     void totalWithoutDiscountEqualsSubtotal() {
         List<Product> products = List.of(
-                new Product("Coffee", new Money(12_500), new VatRate(25), "7312345678901"),
-                new Product("Bread", new Money(3_000), new VatRate(12), "7312345678902")
+                new Product("Coffee", new Money(12_500), new VatRate(25), "7312340000002"),
+                new Product("Bread", new Money(3_000), new VatRate(12), "7312340000002")
         );
 
         Receipt receipt = new Receipt(products);
@@ -48,8 +48,8 @@ class ReceiptTest {
     @Test
     void totalWithTenPercentDiscountIsReduced() {
         List<Product> products = List.of(
-                new Product("Coffee", new Money(12_500), new VatRate(25), "7312345678901"),
-                new Product("Bread", new Money(3_000), new VatRate(12), "7312345678902")
+                new Product("Coffee", new Money(12_500), new VatRate(25), "7312340000002"),
+                new Product("Bread", new Money(3_000), new VatRate(12), "7312340000002")
         );
 
         Receipt receipt = new Receipt(products);
@@ -61,8 +61,8 @@ class ReceiptTest {
     @Test
     void discountAmountIsCorrect() {
         List<Product> products = List.of(
-                new Product("Coffee", new Money(12_500), new VatRate(25), "7312345678901"   ),
-                new Product("Bread", new Money(3_000), new VatRate(12), "7312345678902")
+                new Product("Coffee", new Money(12_500), new VatRate(25), "7312340000002"   ),
+                new Product("Bread", new Money(3_000), new VatRate(12), "7312340000002")
         );
 
         Receipt receipt = new Receipt(products);
@@ -74,8 +74,8 @@ class ReceiptTest {
     @Test
     void vatTotalAfterTenPercentDiscountIsCorrect() {
         List<Product> products = List.of(
-                new Product("Coffee", new Money(12_500), new VatRate(25), "7312345678901"),
-                new Product("Bread", new Money(3_000), new VatRate(12), "7312345678902")
+                new Product("Coffee", new Money(12_500), new VatRate(25), "7312340000002"),
+                new Product("Bread", new Money(3_000), new VatRate(12), "7312340000002")
         );
 
         Receipt receipt = new Receipt(products);
@@ -87,8 +87,8 @@ class ReceiptTest {
     @Test
     void receiptProvidesProductsForPrinting() {
         List<Product> products = List.of(
-                new Product("Coffee", new Money(12_500), new VatRate(25), "7312345678901"),
-                new Product("Bread", new Money(3_000), new VatRate(12), "7312345678902")
+                new Product("Coffee", new Money(12_500), new VatRate(25), "7312340000002"),
+                new Product("Bread", new Money(3_000), new VatRate(12), "7312340000002")
         );
 
         Receipt receipt = new Receipt(products);
