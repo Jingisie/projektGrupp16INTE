@@ -5,10 +5,11 @@ public class Weight implements Comparable<Weight> {
     private final double value;
     private final Unit unit;
 
-    private Weight(double value, Unit unit) {
-        if (value < 0) {
-            throw new IllegalArgumentException("Weight cannot be negative");
+    public Weight(double value, Unit unit) {
+        if (!Double.isFinite(value) || value < 0) {
+            throw new IllegalArgumentException("Invalid weight");
         }
+
         if (unit == null) {
             throw new IllegalArgumentException("Unit cannot be null");
         }
