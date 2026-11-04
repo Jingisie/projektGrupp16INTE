@@ -105,8 +105,8 @@ class ReceiptTest {
     @Test
     void totalUsesInjectedDiscountCalculator() {
         List<Product> products = List.of(
-                new Product("Coffee", new Money(12_500), new VatRate(25)),
-                new Product("Bread", new Money(3_000), new VatRate(12))
+                new Product("Coffee", new Money(12_500), new VatRate(25), "7312340000002"),
+                new Product("Bread", new Money(3_000), new VatRate(12), "7312340000019")
         );
 
         DiscountCalculator calculator = mock(DiscountCalculator.class);
